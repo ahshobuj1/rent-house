@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const {MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
 const jwt = require('jsonwebtoken');
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 5000;
 
 // middleware
 const corsOptions = {
@@ -50,7 +50,7 @@ async function run() {
     try {
         const roomCollection = client.db('stayVista').collection('rooms');
 
-        // auth related api
+        // auth related api0
         app.post('/jwt', async (req, res) => {
             const user = req.body;
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -82,7 +82,12 @@ async function run() {
 
         // Rooms related api's
         app.get('/rooms', async (req, res) => {
-            const result = await roomCollection.find().toArray();
+            const category = req.query.category;
+            let query = {};
+            if (category !== 'null') {
+                query = {category: category};
+            }
+            const result = await roomCollection.find(query).toArray();
             res.send(result);
         });
 
@@ -93,6 +98,7 @@ async function run() {
         );
     } finally {
         // Ensures that the client will close when you finish/error
+        //await client.close();
     }
 }
 run().catch(console.dir);

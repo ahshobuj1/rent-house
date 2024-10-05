@@ -1,28 +1,27 @@
-import {useEffect, useState} from 'react';
 import Card from './Card';
 import Container from '../Shared/Container';
 import Heading from '../Shared/Heading';
 import LoadingSpinner from '../Shared/LoadingSpinner';
 import {useSearchParams} from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query';
+import useAxiosPublic from '../../hooks/useAxiosPublic';
 
 const Rooms = () => {
-    const [rooms, setRooms] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const axiosPublic = useAxiosPublic();
 
     //* Get query to url: Parse and stringify URL query strings
     const [params] = useSearchParams();
     const category = params.get('category');
     console.log(category);
 
-    useEffect(() => {
-        setLoading(true);
-        fetch(`./rooms.json`)
-            .then((res) => res.json())
-            .then((data) => {
-                setRooms(data);
-                setLoading(false);
-            });
-    }, []);
+    // Use TanStack Query
+    const {data: rooms = [], isPending: loading} = useQuery({
+        queryKey: ['rooms', category],
+        queryFn: async () => {
+            const res = await axiosPublic(`/rooms?category=${category}`);
+            return res.data;
+        },
+    });
 
     if (loading) return <LoadingSpinner />;
 
