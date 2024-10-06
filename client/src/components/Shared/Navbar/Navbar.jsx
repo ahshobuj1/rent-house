@@ -68,6 +68,11 @@ const Navbar = () => {
                                             className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold">
                                             Home
                                         </Link>
+                                        <Link
+                                            to="/dashboard"
+                                            className="block px-4 py-3 hover:bg-neutral-100 transition font-semibold">
+                                            Dashboard
+                                        </Link>
 
                                         {user ? (
                                             <>

@@ -142,7 +142,7 @@ const Login = () => {
                 {/* Social Login */}
                 <SocialLogin />
                 <p className="px-6 text-sm text-center text-gray-400">
-                    Don&apos;t have an account yet?{' '}
+                    Do not have an account yet?{' '}
                     <Link
                         to="/signup"
                         className="hover:underline hover:text-rose-500 text-gray-600">
