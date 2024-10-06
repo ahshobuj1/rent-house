@@ -1,11 +1,19 @@
 import {categories} from '../Categories/CategoriesData';
 import {DateRange} from 'react-date-range';
+import {useForm} from 'react-hook-form';
+import {ImSpinner9} from 'react-icons/im';
 
 // eslint-disable-next-line react/prop-types
-const AddRoomForm = ({dates, handleDate}) => {
+const AddRoomForm = ({dates, handleDate, onSubmitForm, loading}) => {
+    const {register, handleSubmit, reset} = useForm();
+
+    const onSubmit = (data) => {
+        onSubmitForm(data, reset);
+    };
+
     return (
         <div className="w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50">
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div className="space-y-6">
                         <div className="space-y-1 text-sm">
@@ -15,12 +23,11 @@ const AddRoomForm = ({dates, handleDate}) => {
                                 Location
                             </label>
                             <input
+                                {...register('location', {required: true})}
                                 className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
-                                name="location"
                                 id="location"
                                 type="text"
                                 placeholder="Location"
-                                required
                             />
                         </div>
 
@@ -31,9 +38,8 @@ const AddRoomForm = ({dates, handleDate}) => {
                                 Category
                             </label>
                             <select
-                                required
-                                className="w-full px-4 py-3 border-rose-300 focus:outline-rose-500 rounded-md"
-                                name="category">
+                                {...register('category', {required: true})}
+                                className="w-full px-4 py-3 border-rose-300 focus:outline-rose-500 rounded-md">
                                 {categories.map((category) => (
                                     <option
                                         value={category.label}
@@ -57,6 +63,7 @@ const AddRoomForm = ({dates, handleDate}) => {
                                 onChange={(item) => handleDate(item)}
                                 moveRangeOnFirstSelection={false}
                                 ranges={[dates]}
+                                required
                             />
                         </div>
                     </div>
@@ -68,12 +75,11 @@ const AddRoomForm = ({dates, handleDate}) => {
                                 Title
                             </label>
                             <input
+                                {...register('title', {required: true})}
                                 className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
-                                name="title"
                                 id="title"
                                 type="text"
                                 placeholder="Title"
-                                required
                             />
                         </div>
 
@@ -82,9 +88,11 @@ const AddRoomForm = ({dates, handleDate}) => {
                                 <div className="flex flex-col w-max mx-auto text-center">
                                     <label>
                                         <input
+                                            {...register('image', {
+                                                required: true,
+                                            })}
                                             className="text-sm cursor-pointer w-36 hidden"
                                             type="file"
-                                            name="image"
                                             id="image"
                                             accept="image/*"
                                             hidden
@@ -104,12 +112,11 @@ const AddRoomForm = ({dates, handleDate}) => {
                                     Price
                                 </label>
                                 <input
+                                    {...register('price', {required: true})}
                                     className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
-                                    name="price"
                                     id="price"
                                     type="number"
                                     placeholder="Price"
-                                    required
                                 />
                             </div>
 
@@ -120,12 +127,13 @@ const AddRoomForm = ({dates, handleDate}) => {
                                     Total guest
                                 </label>
                                 <input
+                                    {...register('total_guest', {
+                                        required: true,
+                                    })}
                                     className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
-                                    name="total_guest"
                                     id="guest"
                                     type="number"
                                     placeholder="Total guest"
-                                    required
                                 />
                             </div>
                         </div>
@@ -138,12 +146,11 @@ const AddRoomForm = ({dates, handleDate}) => {
                                     Bedrooms
                                 </label>
                                 <input
+                                    {...register('bedrooms', {required: true})}
                                     className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
-                                    name="bedrooms"
                                     id="bedrooms"
                                     type="number"
                                     placeholder="Bedrooms"
-                                    required
                                 />
                             </div>
 
@@ -154,12 +161,11 @@ const AddRoomForm = ({dates, handleDate}) => {
                                     Bathrooms
                                 </label>
                                 <input
+                                    {...register('bathrooms', {required: true})}
                                     className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
-                                    name="bathrooms"
                                     id="bathrooms"
                                     type="number"
                                     placeholder="Bathrooms"
-                                    required
                                 />
                             </div>
                         </div>
@@ -172,17 +178,22 @@ const AddRoomForm = ({dates, handleDate}) => {
                             </label>
 
                             <textarea
+                                {...register('description', {required: true})}
                                 id="description"
-                                className="block rounded-md focus:rose-300 w-full h-32 px-4 py-3 text-gray-800  border border-rose-300 focus:outline-rose-500 "
-                                name="description"></textarea>
+                                className="block rounded-md focus:rose-300 w-full h-32 px-4 py-3 text-gray-800  border border-rose-300 focus:outline-rose-500 "></textarea>
                         </div>
                     </div>
                 </div>
 
                 <button
+                    disabled={loading}
                     type="submit"
                     className="w-full p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-rose-500">
-                    Save & Continue
+                    {loading ? (
+                        <ImSpinner9 className="animate-spin" />
+                    ) : (
+                        'Save & Continue'
+                    )}
                 </button>
             </form>
         </div>
