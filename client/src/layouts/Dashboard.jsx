@@ -5,7 +5,7 @@ const Dashboard = () => {
     return (
         <div className="flex gap-6">
             {/* SideNav */}
-            <div>
+            <div className="min-h-screen w-64">
                 <SideNavigation />
             </div>
             {/* Outlet */}
