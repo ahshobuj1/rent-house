@@ -1,9 +1,14 @@
-import {Link} from 'react-router-dom';
-import {FcGoogle} from 'react-icons/fc';
+import {Link, useNavigate} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import {UploadImage} from '../../utilities/UploadImage';
+import useAuth from '../../hooks/useAuth';
+import toast from 'react-hot-toast';
+import SocialLogin from '../../components/SocialLogin/SocialLogin';
 
 const SignUp = () => {
+    const navigate = useNavigate();
+    const {createUser, loading, setLoading, updateUserProfile} = useAuth();
+
     const {
         register,
         handleSubmit,
@@ -11,15 +16,25 @@ const SignUp = () => {
     } = useForm();
 
     const onSubmit = async (data) => {
-        console.log(data);
+        setLoading(true);
+        console.log('form data ', data);
         const {image, name, email, password} = data;
-        const imageFile = data.image[0];
+        if (!image || image.length === 0) {
+            console.log('image not found');
+            return;
+        }
+        const imageFile = image[0];
 
         try {
             const imageUrl = await UploadImage(imageFile);
-            console.log(imageUrl);
+            await createUser(email, password);
+            await updateUserProfile(name, imageUrl);
+            navigate('/');
+            setLoading(false);
+            toast.success('User Created Successfully');
         } catch (error) {
             console.log(error.message);
+            setLoading(false);
         }
     };
 
@@ -45,12 +60,11 @@ const SignUp = () => {
                                 Name
                             </label>
                             <input
+                                type="text"
+                                id="name"
                                 {...register('name', {
                                     required: 'Name is required',
                                 })}
-                                type="text"
-                                name="name"
-                                id="name"
                                 placeholder="Enter Your Name Here"
                                 className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-rose-500 bg-gray-200 text-gray-900"
                                 data-temp-mail-org="0"
@@ -64,13 +78,11 @@ const SignUp = () => {
                                 Select Image:
                             </label>
                             <input
+                                type="file"
+                                id="image"
                                 {...register('image', {
                                     required: 'Image is required',
                                 })}
-                                required
-                                type="file"
-                                id="image"
-                                name="image"
                                 accept="image/*"
                             />
                         </div>
@@ -90,9 +102,7 @@ const SignUp = () => {
                                     },
                                 })}
                                 type="email"
-                                name="email"
                                 id="email"
-                                required
                                 placeholder="Enter Your Email Here"
                                 className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-rose-500 bg-gray-200 text-gray-900"
                                 data-temp-mail-org="0"
@@ -117,10 +127,8 @@ const SignUp = () => {
                                     },
                                 })}
                                 type="password"
-                                name="password"
                                 //autoComplete="123456Aa#"
                                 id="password"
-                                required
                                 placeholder="*******"
                                 className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-rose-500 bg-gray-200 text-gray-900"
                             />
@@ -132,9 +140,10 @@ const SignUp = () => {
 
                     <div>
                         <button
+                            disabled={loading}
                             type="submit"
                             className="bg-rose-500 w-full rounded-md py-3 text-white">
-                            Continue
+                            {loading ? 'Loading...' : 'Continue'}
                         </button>
                     </div>
                 </form>
@@ -145,11 +154,8 @@ const SignUp = () => {
                     </p>
                     <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
                 </div>
-                <div className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer">
-                    <FcGoogle size={32} />
-
-                    <p>Continue with Google</p>
-                </div>
+                {/* Social login */}
+                <SocialLogin />
                 <p className="px-6 text-sm text-center text-gray-400">
                     Already have an account?{' '}
                     <Link
