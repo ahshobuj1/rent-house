@@ -1,5 +1,8 @@
 import {categories} from '../Categories/CategoriesData';
-const AddRoomForm = () => {
+import {DateRange} from 'react-date-range';
+
+// eslint-disable-next-line react/prop-types
+const AddRoomForm = ({dates, handleDate}) => {
     return (
         <div className="w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50">
             <form>
@@ -48,6 +51,13 @@ const AddRoomForm = () => {
                                 Select Availability Range
                             </label>
                             {/* Calender */}
+                            <DateRange
+                                rangeColors={['#f43f5e']}
+                                editableDateInputs={true}
+                                onChange={(item) => handleDate(item)}
+                                moveRangeOnFirstSelection={false}
+                                ranges={[dates]}
+                            />
                         </div>
                     </div>
                     <div className="space-y-6">
