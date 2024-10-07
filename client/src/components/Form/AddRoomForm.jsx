@@ -1,10 +1,17 @@
+/* eslint-disable react/prop-types */
 import {categories} from '../Categories/CategoriesData';
 import {DateRange} from 'react-date-range';
 import {useForm} from 'react-hook-form';
 import {ImSpinner9} from 'react-icons/im';
 
-// eslint-disable-next-line react/prop-types
-const AddRoomForm = ({dates, handleDate, onSubmitForm, loading}) => {
+const AddRoomForm = ({
+    dates,
+    handleDate,
+    onSubmitForm,
+    loading,
+    //imagePrev,
+    // handleImage,
+}) => {
     const {register, handleSubmit, reset} = useForm();
 
     const onSubmit = (data) => {
@@ -83,7 +90,7 @@ const AddRoomForm = ({dates, handleDate, onSubmitForm, loading}) => {
                             />
                         </div>
 
-                        <div className=" p-4 bg-white w-full  m-auto rounded-lg">
+                        <div className=" p-4 bg-white w-full  m-auto rounded-lg flex gap-4">
                             <div className="file_upload px-5 py-3 relative border-4 border-dotted border-gray-300 rounded-lg">
                                 <div className="flex flex-col w-max mx-auto text-center">
                                     <label>
@@ -91,18 +98,29 @@ const AddRoomForm = ({dates, handleDate, onSubmitForm, loading}) => {
                                             {...register('image', {
                                                 required: true,
                                             })}
+                                            /* onChange={(e) =>
+                                                handleImage(e.target.files)
+                                            } */
                                             className="text-sm cursor-pointer w-36 hidden"
                                             type="file"
                                             id="image"
                                             accept="image/*"
                                             hidden
                                         />
+
                                         <div className="bg-rose-500 text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-rose-500">
                                             Upload Image
                                         </div>
                                     </label>
                                 </div>
                             </div>
+                            {/*  <div className="w-16 h-16  flex items-center">
+                                <img
+                                    src={imagePrev}
+                                    className="w-16 max-h-16 rounded-lg"
+                                    alt="preview image"
+                                />
+                            </div> */}
                         </div>
                         <div className="flex justify-between gap-2">
                             <div className="space-y-1 text-sm">
@@ -190,7 +208,9 @@ const AddRoomForm = ({dates, handleDate, onSubmitForm, loading}) => {
                     type="submit"
                     className="w-full p-3 mt-5 text-center font-medium text-white transition duration-200 rounded shadow-md bg-rose-500">
                     {loading ? (
-                        <ImSpinner9 className="animate-spin" />
+                        <p className="text-center max-w-20 mx-auto text-white">
+                            <ImSpinner9 className="animate-spin" />
+                        </p>
                     ) : (
                         'Save & Continue'
                     )}

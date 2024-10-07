@@ -5,10 +5,13 @@ import useAuth from '../../../hooks/useAuth';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import {useMutation} from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import {useNavigate} from 'react-router-dom';
 
 const AddRoom = () => {
+    //const [imagePrev, setImagePrev] = useState(null);
     const {user, loading, setLoading} = useAuth();
     const axiosSecure = useAxiosSecure();
+    const navigate = useNavigate();
 
     // Handle dates
     const [dates, setDates] = useState({
@@ -24,18 +27,18 @@ const AddRoom = () => {
     // Post Room Data with TanStack Query - Mutation
     const {mutateAsync} = useMutation({
         mutationFn: async (roomData) => {
-            const res = await axiosSecure.post('/room', roomData);
+            const res = await axiosSecure.post('/rooms', roomData);
             return res.data;
         },
         onSuccess: () => {
             setLoading(false);
             toast.success('Room added successfully');
+            navigate('/dashboard/my-listings');
         },
     });
 
     // React-Hooks-Form
     const onSubmitForm = async (data, reset) => {
-        setLoading(true);
         const {
             location,
             bathrooms,
@@ -44,12 +47,16 @@ const AddRoom = () => {
             price,
             title,
             description,
-            total_guest,
+            guests: total_guest,
         } = data;
 
+        console.log(data);
+
         const imageFile = data.image[0];
+        console.log(imageFile);
 
         try {
+            setLoading(true);
             const imageUrl = await UploadImage(imageFile);
             const roomData = {
                 location,
@@ -60,6 +67,8 @@ const AddRoom = () => {
                 title,
                 description,
                 total_guest,
+                form: dates.startDate,
+                to: dates.endDate,
                 image: imageUrl,
                 host: {
                     name: user?.displayName,
@@ -76,6 +85,11 @@ const AddRoom = () => {
         }
     };
 
+    // Handle preview image
+    /*  const handleImage = (image) => {
+        setImagePrev(URL.createObjectURL(image[0]));
+    }; */
+
     return (
         <div>
             <AddRoomForm
@@ -83,6 +97,8 @@ const AddRoom = () => {
                 handleDate={handleDate}
                 onSubmitForm={onSubmitForm}
                 loading={loading}
+                // imagePrev={imagePrev}
+                // handleImage={handleImage}
             />
         </div>
     );

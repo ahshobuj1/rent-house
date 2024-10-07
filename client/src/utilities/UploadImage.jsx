@@ -11,5 +11,5 @@ export const UploadImage = async (imageFile) => {
         }`,
         formData
     );
-    return res.data.data.url;
+    return res?.data?.data?.url;
 };
