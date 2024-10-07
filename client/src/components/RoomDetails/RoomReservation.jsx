@@ -4,13 +4,19 @@ import {DateRange} from 'react-date-range';
 import {useState} from 'react';
 
 const RoomReservation = ({room}) => {
+    const initialStartDate = room?.from ? new Date(room.from) : new Date();
+    const initialEndDate = room?.to ? new Date(room.to) : new Date();
+
     const [state, setState] = useState([
         {
-            startDate: new Date(),
-            endDate: new Date(),
+            startDate: initialStartDate,
+            endDate: initialEndDate,
             key: 'selection',
         },
     ]);
+
+    console.log('room to -->', room.to);
+    console.log('room from -->', room.from);
 
     return (
         <div className="rounded-xl border-[1px] border-neutral-200 overflow-hidden bg-white">
@@ -24,8 +30,16 @@ const RoomReservation = ({room}) => {
                 <DateRange
                     rangeColors={['#f43f5e']}
                     showDateDisplay={false}
-                    editableDateInputs={true}
-                    onChange={(item) => setState([item.selection])}
+                    onChange={(item) => {
+                        console.log(item);
+                        setState([
+                            {
+                                startDate: initialStartDate,
+                                endDate: initialEndDate,
+                                key: 'selection',
+                            },
+                        ]);
+                    }}
                     moveRangeOnFirstSelection={false}
                     ranges={state}
                 />
