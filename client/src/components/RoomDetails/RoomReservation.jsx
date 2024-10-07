@@ -1,19 +1,36 @@
 import PropTypes from 'prop-types';
 import Button from '../Shared/Button/Button';
 import {DateRange} from 'react-date-range';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import {differenceInCalendarDays} from 'date-fns';
 
 const RoomReservation = ({room}) => {
-    const initialStartDate = room?.from ? new Date(room.from) : new Date();
-    const initialEndDate = room?.to ? new Date(room.to) : new Date();
-
     const [state, setState] = useState([
         {
-            startDate: initialStartDate,
-            endDate: initialEndDate,
+            startDate: room?.from ? new Date(room.from) : new Date(),
+            endDate: room?.to ? new Date(room.to) : new Date(),
             key: 'selection',
         },
     ]);
+
+    // Update state when room prop changes
+    useEffect(() => {
+        if (room?.from && room?.to) {
+            setState([
+                {
+                    startDate: new Date(room.from),
+                    endDate: new Date(room.to),
+                    key: 'selection',
+                },
+            ]);
+        }
+    }, [room]);
+
+    const totalPrice =
+        differenceInCalendarDays(new Date(room?.to), new Date(room?.from)) *
+        room?.price;
+
+    console.log(totalPrice);
 
     console.log('room to -->', room.to);
     console.log('room from -->', room.from);
@@ -34,8 +51,8 @@ const RoomReservation = ({room}) => {
                         console.log(item);
                         setState([
                             {
-                                startDate: initialStartDate,
-                                endDate: initialEndDate,
+                                startDate: new Date(room.from),
+                                endDate: new Date(room.to),
                                 key: 'selection',
                             },
                         ]);
@@ -51,7 +68,7 @@ const RoomReservation = ({room}) => {
             <hr />
             <div className="p-4 flex items-center justify-between font-semibold text-lg">
                 <div>Total</div>
-                <div>${room?.price}</div>
+                <div>${totalPrice}</div>
             </div>
         </div>
     );
