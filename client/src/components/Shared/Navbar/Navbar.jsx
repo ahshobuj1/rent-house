@@ -4,48 +4,27 @@ import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import avatarImg from '../../../assets/images/placeholder.jpg';
-import useAxiosSecure from '../../../hooks/useAxiosSecure';
-import toast from 'react-hot-toast';
-import Swal from 'sweetalert2';
+// import useAxiosSecure from '../../../hooks/useAxiosSecure';
+// import toast from 'react-hot-toast';
+// import Swal from 'sweetalert2';
 import useRole from '../../../hooks/useRole';
+import useHandleRequestHost from '../../../hooks/useHandleRequestHost';
 
 const Navbar = () => {
     const {user, logOut} = useAuth();
     const [isOpen, setIsOpen] = useState(false);
-    const axiosSecure = useAxiosSecure();
+    // const axiosSecure = useAxiosSecure();
     const [role] = useRole();
     console.log('user role ->>', role);
+    const {handleRequestHost} = useHandleRequestHost();
 
     // Request for host
-    const handleRequestHost = () => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You want to be host!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, Request!',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const res = await axiosSecure.put(`/user`, updateStatus);
-
-                    if (res.data.modifiedCount > 0) {
-                        toast.success('Successfully requested for host!');
-                    } else {
-                        toast.success('Wait for admin approval!');
-                    }
-                } catch (error) {
-                    console.log(error);
-                    toast.error(error.message);
-                }
-            }
-        });
+    const handleSendRequest = () => {
         const updateStatus = {
             email: user?.email,
             status: 'Requested',
         };
+        handleRequestHost(updateStatus);
     };
 
     return (
@@ -71,7 +50,7 @@ const Navbar = () => {
                                 <div className="hidden md:block">
                                     {user && role === 'Guest' && (
                                         <button
-                                            onClick={handleRequestHost}
+                                            onClick={handleSendRequest}
                                             key={user._id}
                                             disabled={!user}
                                             className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
