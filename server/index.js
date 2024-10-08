@@ -94,7 +94,16 @@ async function run() {
             // Check is exist user
             const isExistUser = await userCollection.findOne(query);
             if (isExistUser) {
-                return res.send(isExistUser);
+                if (user.status === 'Requested') {
+                    const updatedStatus = {$set: {status: user?.status}};
+                    const result = await userCollection.updateOne(
+                        query,
+                        updatedStatus
+                    );
+                    return res.send(result);
+                } else {
+                    return res.send(isExistUser);
+                }
             }
 
             const options = {upsert: true};

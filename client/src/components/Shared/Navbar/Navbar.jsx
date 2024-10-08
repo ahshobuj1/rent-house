@@ -4,28 +4,23 @@ import {useState} from 'react';
 import {Link} from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import avatarImg from '../../../assets/images/placeholder.jpg';
-import useLoadUsers from '../../../hooks/useLoadUsers';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
     const {user, logOut} = useAuth();
     const [isOpen, setIsOpen] = useState(false);
-    const [users] = useLoadUsers();
     const axiosSecure = useAxiosSecure();
-    console.log('users ->> ', users);
 
     // Request for host
     const handleRequestHost = async () => {
-        const currentUser = {
+        const updateStatus = {
+            email: user?.email,
             status: 'Requested',
         };
 
         try {
-            const res = await axiosSecure.patch(
-                `user/${user?.email}`,
-                currentUser
-            );
+            const res = await axiosSecure.put(`/user`, updateStatus);
 
             if (res.data.modifiedCount > 0) {
                 toast.success('Successfully requested for host!');
@@ -59,19 +54,15 @@ const Navbar = () => {
                             <div className="flex flex-row items-center gap-3">
                                 {/* Become A Host btn */}
                                 <div className="hidden md:block">
-                                    {users.map((user) => {
-                                        return (
-                                            user?.role === 'Guest' && (
-                                                <button
-                                                    onClick={handleRequestHost}
-                                                    key={user._id}
-                                                    disabled={!user}
-                                                    className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
-                                                    Host your home
-                                                </button>
-                                            )
-                                        );
-                                    })}
+                                    {user && (
+                                        <button
+                                            onClick={handleRequestHost}
+                                            key={user._id}
+                                            disabled={!user}
+                                            className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
+                                            Host your home
+                                        </button>
+                                    )}
                                 </div>
                                 {/* Dropdown btn */}
                                 <div
