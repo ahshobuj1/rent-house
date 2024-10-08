@@ -5,9 +5,11 @@ import {useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import toast from 'react-hot-toast';
+import useAuth from '../../hooks/useAuth';
 const UserDataRow = ({user, refetch, isPending}) => {
     const [isOpen, setIsOpen] = useState(false);
     const axiosSecure = useAxiosSecure();
+    const {user: currentUser} = useAuth();
 
     // Update user role
     const {mutateAsync} = useMutation({
@@ -75,12 +77,17 @@ const UserDataRow = ({user, refetch, isPending}) => {
             <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 <button
                     onClick={() => setIsOpen(true)}
+                    disabled={currentUser?.email === user?.email}
                     className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
                     aria-label={`Update role for ${user?.email}`}>
                     <span
                         aria-hidden="true"
                         className="absolute inset-0 bg-green-200 opacity-50 rounded-lg"></span>
-                    <span className="relative">Update Role</span>
+                    <span className="relative">
+                        {currentUser?.email === user?.email
+                            ? 'Your Role..!'
+                            : 'Update Role'}
+                    </span>
                 </button>
                 {/* Update User Modal */}
                 <UpdateUserModal
