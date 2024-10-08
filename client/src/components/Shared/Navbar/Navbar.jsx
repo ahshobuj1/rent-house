@@ -6,31 +6,46 @@ import useAuth from '../../../hooks/useAuth';
 import avatarImg from '../../../assets/images/placeholder.jpg';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
+import useRole from '../../../hooks/useRole';
 
 const Navbar = () => {
     const {user, logOut} = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const axiosSecure = useAxiosSecure();
+    const [role] = useRole();
+    console.log('user role ->>', role);
 
     // Request for host
-    const handleRequestHost = async () => {
+    const handleRequestHost = () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to be host!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Request!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const res = await axiosSecure.put(`/user`, updateStatus);
+
+                    if (res.data.modifiedCount > 0) {
+                        toast.success('Successfully requested for host!');
+                    } else {
+                        toast.success('Wait for admin approval!');
+                    }
+                } catch (error) {
+                    console.log(error);
+                    toast.error(error.message);
+                }
+            }
+        });
         const updateStatus = {
             email: user?.email,
             status: 'Requested',
         };
-
-        try {
-            const res = await axiosSecure.put(`/user`, updateStatus);
-
-            if (res.data.modifiedCount > 0) {
-                toast.success('Successfully requested for host!');
-            } else {
-                toast.success('Wait for admin approval!');
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(error.message);
-        }
     };
 
     return (

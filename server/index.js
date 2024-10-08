@@ -88,6 +88,12 @@ async function run() {
             res.send(result);
         });
 
+        app.get('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const result = await userCollection.findOne({email});
+            res.send(result);
+        });
+
         app.put('/user', async (req, res) => {
             const user = req.body;
             const query = {email: user.email};
@@ -95,6 +101,7 @@ async function run() {
             const isExistUser = await userCollection.findOne(query);
             if (isExistUser) {
                 if (user.status === 'Requested') {
+                    // Update Status
                     const updatedStatus = {$set: {status: user?.status}};
                     const result = await userCollection.updateOne(
                         query,

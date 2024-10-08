@@ -72,7 +72,6 @@ const RoomReservation = ({room}) => {
             </div>
         </div>
     );
-    1;
 };
 
 RoomReservation.propTypes = {
