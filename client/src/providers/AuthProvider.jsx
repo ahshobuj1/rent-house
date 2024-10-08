@@ -13,6 +13,7 @@ import {
 } from 'firebase/auth';
 import {app} from '../firebase/firebase.config';
 import axios from 'axios';
+
 export const AuthContext = createContext(null);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
@@ -55,6 +56,22 @@ const AuthProvider = ({children}) => {
             photoURL: photo,
         });
     };
+
+    // Save User in db
+    const saveUser = (user) => {
+        const userData = {
+            email: user?.email,
+            name: user?.displayName,
+            role: 'Guest',
+            status: 'Normal',
+        };
+
+        console.log('user data ->> ', userData);
+
+        const res = axios.put(`${import.meta.env.VITE_API_URL}/user`, userData);
+        return res.data;
+    };
+
     // Get token from server
     /*   const getToken = async (email) => {
         const {data} = await axios.post(
@@ -72,6 +89,7 @@ const AuthProvider = ({children}) => {
             console.log('currentUser: ', currentUser);
             if (currentUser) {
                 // getToken(currentUser.email);
+                saveUser(currentUser);
             }
             setLoading(false);
         });

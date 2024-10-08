@@ -3,7 +3,7 @@ const app = express();
 require('dotenv').config();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const {MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
+const {MongoClient, ServerApiVersion, ObjectId, Timestamp} = require('mongodb');
 const jwt = require('jsonwebtoken');
 
 const port = process.env.PORT || 5000;
@@ -49,6 +49,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const roomCollection = client.db('stayVista').collection('rooms');
+        const userCollection = client.db('stayVista').collection('users');
 
         // auth related api0
         app.post('/jwt', async (req, res) => {
@@ -78,6 +79,37 @@ async function run() {
             } catch (err) {
                 res.status(500).send(err);
             }
+        });
+
+        // User related api's
+
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray();
+            res.send(result);
+        });
+
+        app.put('/user', async (req, res) => {
+            const user = req.body;
+            const query = {email: user.email};
+            // Check is exist user
+            const isExistUser = await userCollection.findOne(query);
+            if (isExistUser) {
+                return res.send(isExistUser);
+            }
+
+            const options = {upsert: true};
+            const updatedDoc = {
+                $set: {
+                    ...user,
+                    Timestamp: Date.now(),
+                },
+            };
+            const result = await userCollection.updateOne(
+                query,
+                updatedDoc,
+                options
+            );
+            res.send(result);
         });
 
         // Rooms related api's
