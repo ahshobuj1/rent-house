@@ -1,17 +1,19 @@
 import {useState} from 'react';
 import {GrLogout} from 'react-icons/gr';
 import {FcSettings} from 'react-icons/fc';
-import {BsFillHouseAddFill} from 'react-icons/bs';
 import {AiOutlineBars} from 'react-icons/ai';
-import {BsGraphUp} from 'react-icons/bs';
 import {NavLink} from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import {Link} from 'react-router-dom';
-import {MdHomeWork} from 'react-icons/md';
+import HostMenu from '../../../components/Dashboard/Sidenav/HostMenu';
+import GuestMenu from '../../../components/Dashboard/Sidenav/GuestMenu';
+import AdminMenu from '../../../components/Dashboard/Sidenav/AdminMenu';
+import useRole from '../../../hooks/useRole';
 
 const SideNavigation = () => {
     const {logOut} = useAuth();
     const [isActive, setActive] = useState(false);
+    const [role] = useRole();
 
     // Sidebar Responsive Handler
     const handleToggle = () => {
@@ -68,56 +70,14 @@ const SideNavigation = () => {
 
                         {/*  Menu Items */}
                         <nav>
-                            {/* Statistics */}
-                            <NavLink
-                                to="/dashboard"
-                                end
-                                className={({isActive}) =>
-                                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform hover:bg-gray-300   hover:text-gray-700 ${
-                                        isActive
-                                            ? 'bg-gray-300  text-gray-700'
-                                            : 'text-gray-600'
-                                    }`
-                                }>
-                                <BsGraphUp className="w-5 h-5" />
+                            {/* Guest Access */}
+                            {role === 'Guest' && <GuestMenu />}
 
-                                <span className="mx-4 font-medium">
-                                    Statistics
-                                </span>
-                            </NavLink>
+                            {/* Host Access */}
+                            {role === 'Host' && <HostMenu />}
 
-                            {/* Add Room */}
-                            <NavLink
-                                to="/dashboard/add-room"
-                                className={({isActive}) =>
-                                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
-                                        isActive
-                                            ? 'bg-gray-300  text-gray-700'
-                                            : 'text-gray-600'
-                                    }`
-                                }>
-                                <BsFillHouseAddFill className="w-5 h-5" />
-
-                                <span className="mx-4 font-medium">
-                                    Add Room
-                                </span>
-                            </NavLink>
-                            {/* My Listing */}
-                            <NavLink
-                                to="/dashboard/my-listings"
-                                className={({isActive}) =>
-                                    `flex items-center px-4 py-2 my-5  transition-colors duration-300 transform  hover:bg-gray-300   hover:text-gray-700 ${
-                                        isActive
-                                            ? 'bg-gray-300  text-gray-700'
-                                            : 'text-gray-600'
-                                    }`
-                                }>
-                                <MdHomeWork className="w-5 h-5" />
-
-                                <span className="mx-4 font-medium">
-                                    My Listings
-                                </span>
-                            </NavLink>
+                            {/* Admin Access */}
+                            {role === 'Admin' && <AdminMenu />}
                         </nav>
                     </div>
                 </div>

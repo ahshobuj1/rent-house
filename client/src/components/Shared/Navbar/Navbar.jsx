@@ -69,7 +69,7 @@ const Navbar = () => {
                             <div className="flex flex-row items-center gap-3">
                                 {/* Become A Host btn */}
                                 <div className="hidden md:block">
-                                    {user && (
+                                    {user && role === 'Guest' && (
                                         <button
                                             onClick={handleRequestHost}
                                             key={user._id}
