@@ -17,6 +17,7 @@ const roles = ['Guest', 'Host', 'Admin'];
 
 const UpdateUserModal = ({setIsOpen, isOpen, modalHandler, user}) => {
     const [selected, setSelected] = useState(user.role);
+
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog

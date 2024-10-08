@@ -2,11 +2,43 @@ import PropTypes from 'prop-types';
 import LoadingSpinner from '../Shared/LoadingSpinner';
 import UpdateUserModal from '../Modal/UpdateUserModal';
 import {useState} from 'react';
+import {useMutation} from '@tanstack/react-query';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
+import toast from 'react-hot-toast';
 const UserDataRow = ({user, refetch, isPending}) => {
     const [isOpen, setIsOpen] = useState(false);
+    const axiosSecure = useAxiosSecure();
 
-    const modalHandler = (selected) => {
-        console.log('selected user role -->>', selected);
+    // Update user role
+    const {mutateAsync} = useMutation({
+        mutationFn: async (updateRole) => {
+            const res = await axiosSecure.patch(
+                `/update-role/${user?.email}`,
+                updateRole
+            );
+            return res.data;
+        },
+
+        onSuccess: () => {
+            toast.success('User role updated successfully');
+            setIsOpen(false);
+            refetch();
+        },
+    });
+
+    const modalHandler = async (selected) => {
+        const updateRole = {
+            role: selected,
+            status: 'Normal',
+        };
+
+        try {
+            // Call mutation to patch user role
+            await mutateAsync(updateRole);
+        } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+        }
     };
 
     if (isPending) {
@@ -27,11 +59,11 @@ const UserDataRow = ({user, refetch, isPending}) => {
                 {user?.status ? (
                     <p
                         className={`${
-                            user.status === 'Normal'
+                            user?.status === 'Normal'
                                 ? 'text-green-500'
                                 : 'text-red-500'
                         } whitespace-no-wrap`}>
-                        {user.status}
+                        {user?.status}
                     </p>
                 ) : (
                     <p className="text-red-500 whitespace-no-wrap">
@@ -43,7 +75,8 @@ const UserDataRow = ({user, refetch, isPending}) => {
             <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                    className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
+                    aria-label={`Update role for ${user?.email}`}>
                     <span
                         aria-hidden="true"
                         className="absolute inset-0 bg-green-200 opacity-50 rounded-lg"></span>

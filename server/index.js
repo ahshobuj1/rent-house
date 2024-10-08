@@ -142,6 +142,20 @@ async function run() {
             res.send(result);
         });
 
+        app.patch('/update-role/:email', async (req, res) => {
+            const email = req.params.email;
+            const updateRole = req.body;
+            const query = {email: email};
+            const updatedDoc = {
+                $set: {
+                    role: updateRole.role,
+                    status: updateRole.status,
+                },
+            };
+            const result = await userCollection.updateMany(query, updatedDoc);
+            res.send(result);
+        });
+
         // Rooms related api's
         app.get('/rooms', async (req, res) => {
             const category = req.query.category;
