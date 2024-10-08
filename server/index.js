@@ -112,6 +112,20 @@ async function run() {
             res.send(result);
         });
 
+        app.patch('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const status = req.body;
+            const query = {email: email};
+            console.log('status ->>', status);
+            const updatedDoc = {
+                $set: {
+                    status: status.status,
+                },
+            };
+            const result = await userCollection.updateOne(query, updatedDoc);
+            res.send(result);
+        });
+
         // Rooms related api's
         app.get('/rooms', async (req, res) => {
             const category = req.query.category;
