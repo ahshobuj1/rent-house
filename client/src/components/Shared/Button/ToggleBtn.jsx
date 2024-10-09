@@ -25,5 +25,6 @@ const ToggleBtn = ({toggleHandler, toggle}) => {
 
 ToggleBtn.propTypes = {
     toggleHandler: PropTypes.func,
+    toggle: PropTypes.bool,
 };
 export default ToggleBtn;
