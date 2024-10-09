@@ -40,7 +40,7 @@ const RoomDetails = () => {
                             />
                             <div className="w-full md:h-[60vh] overflow-hidden rounded-xl">
                                 <img
-                                    className="object-cover bg-cover w-full"
+                                    className="object-cover w-full"
                                     src={room.image}
                                     alt="header image"
                                 />
@@ -96,7 +96,7 @@ const RoomDetails = () => {
 
                         <div className="md:col-span-3 order-first md:order-last mb-10">
                             {/* RoomReservation */}
-                            <RoomReservation room={room} />
+                            <RoomReservation room={room} loading={loading} />
                         </div>
                     </div>
                 </div>
