@@ -80,7 +80,7 @@ const Login = () => {
                                     required: 'Password is required',
                                 })}
                                 type="password"
-                                autoComplete="123456Aa#"
+                                defaultValue="123456Aa#"
                                 id="password"
                                 placeholder="*******"
                                 className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-rose-500 bg-gray-200 text-gray-900"

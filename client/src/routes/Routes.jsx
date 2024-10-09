@@ -13,6 +13,7 @@ import AddRoom from '../pages/Dashboard/Host/AddRoom';
 import ManageUsers from '../pages/Dashboard/Admin/ManageUsers';
 import Profile from '../pages/Dashboard/Common/Profile';
 import ManageBookings from '../pages/Dashboard/Host/ManageBookings';
+import MyBookings from '../pages/Dashboard/Guest/MyBookings';
 
 export const router = createBrowserRouter([
     {
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
             {
                 path: 'manage-bookings',
                 element: <ManageBookings />,
+            },
+            {
+                path: 'my-bookings',
+                element: <MyBookings />,
             },
         ],
     },
