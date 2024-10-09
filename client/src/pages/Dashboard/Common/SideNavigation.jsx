@@ -9,16 +9,25 @@ import HostMenu from '../../../components/Dashboard/Sidenav/HostMenu';
 import GuestMenu from '../../../components/Dashboard/Sidenav/GuestMenu';
 import AdminMenu from '../../../components/Dashboard/Sidenav/AdminMenu';
 import useRole from '../../../hooks/useRole';
+import ToggleBtn from '../../../components/Shared/Button/ToggleBtn';
 
 const SideNavigation = () => {
     const {logOut} = useAuth();
     const [isActive, setActive] = useState(false);
     const [role] = useRole();
+    const [toggle, setToggle] = useState(true);
 
     // Sidebar Responsive Handler
     const handleToggle = () => {
         setActive(!isActive);
     };
+
+    // Toggle Host to Guest
+    const toggleHandler = () => {
+        console.log(toggle, 'toggle');
+        setToggle(!toggle);
+    };
+
     return (
         <>
             {/* Small Screen Navbar */}
@@ -70,11 +79,20 @@ const SideNavigation = () => {
 
                         {/*  Menu Items */}
                         <nav>
+                            {/* Set toggle btn  */}
+                            {role === 'Host' && (
+                                <ToggleBtn
+                                    toggleHandler={toggleHandler}
+                                    toggle={toggle}
+                                />
+                            )}
+
                             {/* Guest Access */}
                             {role === 'Guest' && <GuestMenu />}
 
                             {/* Host Access */}
-                            {role === 'Host' && <HostMenu />}
+                            {role === 'Host' && toggle && <HostMenu />}
+                            {role === 'Host' && !toggle && <GuestMenu />}
 
                             {/* Admin Access */}
                             {role === 'Admin' && <AdminMenu />}
