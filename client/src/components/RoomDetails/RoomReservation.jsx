@@ -31,7 +31,6 @@ const RoomReservation = ({room}) => {
         room?.price;
 
     console.log(totalPrice);
-
     console.log('room to -->', room.to);
     console.log('room from -->', room.from);
 

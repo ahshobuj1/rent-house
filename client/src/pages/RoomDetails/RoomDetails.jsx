@@ -40,7 +40,7 @@ const RoomDetails = () => {
                             />
                             <div className="w-full md:h-[60vh] overflow-hidden rounded-xl">
                                 <img
-                                    className="object-cover w-full"
+                                    className="object-cover bg-cover w-full"
                                     src={room.image}
                                     alt="header image"
                                 />

@@ -39,6 +39,8 @@ const AddRoom = () => {
 
     // React-Hooks-Form
     const onSubmitForm = async (data, reset) => {
+        const from = dates.startDate;
+        const to = dates.endDate;
         const {
             location,
             bathrooms,
@@ -51,7 +53,6 @@ const AddRoom = () => {
         } = data;
 
         console.log(data);
-
         const imageFile = data.image[0];
         console.log(imageFile);
 
@@ -67,8 +68,8 @@ const AddRoom = () => {
                 title,
                 description,
                 total_guest,
-                form: dates.startDate,
-                to: dates.endDate,
+                from,
+                to,
                 image: imageUrl,
                 host: {
                     name: user?.displayName,
