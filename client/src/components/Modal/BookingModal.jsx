@@ -9,6 +9,7 @@ import {
 import {format} from 'date-fns';
 import {Fragment} from 'react';
 import LoadingSpinner from '../Shared/LoadingSpinner';
+import PaymentElements from '../StripePaymentMethod/PaymentElements';
 
 const BookingModal = ({closeModal, isOpen, bookingInfo}) => {
     if (!bookingInfo.from || !bookingInfo.to) {
@@ -83,7 +84,8 @@ const BookingModal = ({closeModal, isOpen, bookingInfo}) => {
                                     </p>
                                 </div>
                                 <hr className="mt-8 " />
-                                {/* checkout form */}
+                                {/* Stripe payment element */}
+                                <PaymentElements bookingInfo={bookingInfo} />
                             </DialogPanel>
                         </TransitionChild>
                     </div>

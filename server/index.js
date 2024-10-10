@@ -5,6 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const {MongoClient, ServerApiVersion, ObjectId, Timestamp} = require('mongodb');
 const jwt = require('jsonwebtoken');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const port = process.env.PORT || 5000;
 
@@ -50,6 +51,7 @@ async function run() {
     try {
         const roomCollection = client.db('stayVista').collection('rooms');
         const userCollection = client.db('stayVista').collection('users');
+        const bookingCollection = client.db('stayVista').collection('bookings');
 
         // auth related api0
         app.post('/jwt', async (req, res) => {
@@ -79,6 +81,42 @@ async function run() {
             } catch (err) {
                 res.status(500).send(err);
             }
+        });
+
+        // Create payment intent
+        app.post('/create-payment-intent', async (req, res) => {
+            const {price} = req.body;
+            if (price < 0) return;
+            const totalPrice = parseFloat(price) * 100;
+            const {client_secret} = await stripe.paymentIntents.create({
+                amount: totalPrice,
+                currency: 'usd',
+                automatic_payment_methods: {
+                    enabled: true,
+                },
+            });
+            res.send({clientSecret: client_secret});
+        });
+
+        // Booking related api, Payment History
+        app.post('/booking', async (req, res) => {
+            const paymentInfo = req.body;
+            const result = bookingCollection.insertOne(paymentInfo);
+            res.send(result);
+        });
+
+        // Update status: true after booked room
+        app.patch('/update-status/:id', async (req, res) => {
+            const id = req.params.id;
+            const {status} = req.body;
+            const query = {_id: new ObjectId(id)};
+            const updatedDoc = {
+                $set: {
+                    status: status,
+                },
+            };
+            const result = await roomCollection.updateOne(query, updatedDoc);
+            res.send(result);
         });
 
         // User related api's
