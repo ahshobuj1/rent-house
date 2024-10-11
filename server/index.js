@@ -114,6 +114,14 @@ async function run() {
             res.send(result);
         });
 
+        // Get Host bookings
+        app.get('/booking-host/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {'host.email': email};
+            const result = await bookingCollection.find(query).toArray();
+            res.send(result);
+        });
+
         // Booking related api, Payment History
         app.post('/booking', async (req, res) => {
             const paymentInfo = req.body;

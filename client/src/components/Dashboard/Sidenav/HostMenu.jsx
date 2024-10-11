@@ -1,9 +1,14 @@
-import {BsFillHouseAddFill} from 'react-icons/bs';
+import {BsFillHouseAddFill, BsGraphUp} from 'react-icons/bs';
 import {MdHomeWork, MdOutlineManageHistory} from 'react-icons/md';
 import MenuItem from './MenuItem';
 const HostMenu = () => {
     return (
         <>
+            <MenuItem
+                icon={BsGraphUp}
+                label="Statistics"
+                address="/dashboard"
+            />
             <MenuItem
                 icon={BsFillHouseAddFill}
                 label="Add Room"

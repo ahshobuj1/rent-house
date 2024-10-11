@@ -1,4 +1,4 @@
-import {BsFingerprint} from 'react-icons/bs';
+import {BsFingerprint, BsGraphUp} from 'react-icons/bs';
 import {GrUserAdmin} from 'react-icons/gr';
 import MenuItem from './/MenuItem';
 import useHandleRequestHost from '../../../hooks/useHandleRequestHost';
@@ -20,6 +20,12 @@ const GuestMenu = () => {
 
     return (
         <>
+            <MenuItem
+                icon={BsGraphUp}
+                label="Statistics"
+                address="/dashboard"
+            />
+
             <MenuItem
                 icon={BsFingerprint}
                 label="My Bookings"
