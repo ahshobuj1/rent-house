@@ -181,14 +181,38 @@ async function run() {
       const totalRooms = await roomCollection.estimatedDocumentCount();
       const totalBookings = await bookingCollection.estimatedDocumentCount();
 
-      const options = {projection: {price: 1}};
+      const options = {projection: {price: 1, date: 1}};
       const totalSales = await bookingCollection.find({}, options).toArray();
       const totalPrice = totalSales.reduce(
         (prev, sales) => prev + sales.price,
         0
       );
 
-      res.send({totalUsers, totalBookings, totalRooms, totalPrice});
+      // Created chartData
+      const chartData = totalSales.map((booking) => {
+        const date = new Date(booking.date);
+        const formatDate = date.toLocaleDateString('en-GB');
+        return [formatDate, booking.price];
+      });
+      chartData.unshift(['day', 'sales']);
+
+      res.send({totalUsers, totalBookings, totalRooms, totalPrice, chartData});
+
+      // create a chartData seemlier this
+      // ["Year", "Sales"],
+      // ["2013", 1000],
+      // ["2014", 1170],
+      // ["2015", 660],
+      // ["2016", 1030],
+
+      // Normal way
+      // const day = totalSales.map((booking) => new Date(booking.date).getDate());
+      // const month = totalSales.map((booking) =>
+      //   new Date(booking.date).getMonth()
+      // );
+      // const price = totalSales.map((booking) => booking.price);
+      // const chartData = [`${day}/${month}`, ` ${price}`];
+      // chartData.unshift(['day', 'sales']);
     });
 
     // User related api's
