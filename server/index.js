@@ -185,11 +185,10 @@ async function run() {
 
         // Admin statistics
         // app.get('/admin-stat', async (req, res) => {
-
+        //     const total
         // });
 
         // User related api's
-
         app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
             const result = await userCollection.find().toArray();
             res.send(result);
@@ -300,7 +299,7 @@ async function run() {
             res.send(result);
         });
 
-        app.post('/rooms', verifyToken, verifyHost, async (req, res) => {
+        app.post('/rooms', verifyToken, async (req, res) => {
             const roomData = req.body;
             const result = await roomCollection.insertOne(roomData);
             res.send(result);
