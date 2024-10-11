@@ -20,23 +20,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-// Verify Token Middleware
-const verifyToken = async (req, res, next) => {
-    const token = req.cookies?.token;
-    console.log(token);
-    if (!token) {
-        return res.status(401).send({message: 'unauthorized access'});
-    }
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            console.log(err);
-            return res.status(401).send({message: 'unauthorized access'});
-        }
-        req.user = decoded;
-        next();
-    });
-};
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@ecommercedatabase.la5qrjd.mongodb.net/?retryWrites=true&w=majority&appName=ecommerceDatabase`;
 
 const client = new MongoClient(uri, {
@@ -53,18 +36,75 @@ async function run() {
         const userCollection = client.db('stayVista').collection('users');
         const bookingCollection = client.db('stayVista').collection('bookings');
 
+        // Middlewares
+        // Verify Token Middleware
+        const verifyToken = async (req, res, next) => {
+            const token = req.cookies?.token;
+            if (!token) {
+                return res.status(401).send({message: 'unauthorized access'});
+            }
+            jwt.verify(
+                token,
+                process.env.ACCESS_TOKEN_SECRET,
+                (err, decoded) => {
+                    if (err) {
+                        console.log(err);
+                        return res
+                            .status(401)
+                            .send({message: 'unauthorized access'});
+                    }
+                    req.user = decoded;
+                    next();
+                }
+            );
+        };
+
+        // Verify Admin
+        const verifyAdmin = async (req, res, next) => {
+            const userInfo = req?.user;
+            const query = {email: userInfo.email};
+            const user = await userCollection.findOne(query);
+
+            if (!user)
+                return res.status(401).send({message: 'unauthorized access'});
+            if (user.role === 'Admin') {
+                return next();
+            }
+            res.status(403).json({message: 'forbidden access'});
+        };
+
+        // Verify host
+        const verifyHost = async (req, res, next) => {
+            const userInfo = req.user;
+            const query = {email: userInfo.email};
+            const user = await userCollection.findOne(query);
+            if (!user)
+                return res.status(401).send({message: 'unauthorized access'});
+            if (user.role === 'Host') return next();
+            res.status(403).json({message: 'forbidden access'});
+        };
+
         // auth related api0
         app.post('/jwt', async (req, res) => {
             const user = req.body;
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-                expiresIn: '365d',
-            });
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite:
-                    process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            }).send({success: true});
+            try {
+                const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                    expiresIn: '365d',
+                });
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite:
+                        process.env.NODE_ENV === 'production'
+                            ? 'none'
+                            : 'strict',
+                }).send({success: true});
+            } catch (error) {
+                res.status(500).send({
+                    success: false,
+                    message: 'Token generation failed',
+                });
+            }
         });
         // Logout
         app.get('/logout', async (req, res) => {
@@ -84,7 +124,7 @@ async function run() {
         });
 
         // Create payment intent
-        app.post('/create-payment-intent', async (req, res) => {
+        app.post('/create-payment-intent', verifyToken, async (req, res) => {
             const {price} = req.body;
             if (price < 0) return;
             const totalPrice = parseFloat(price) * 100;
@@ -99,7 +139,7 @@ async function run() {
         });
 
         // Get Guest bookings
-        app.get('/booking-guest/:email', async (req, res) => {
+        app.get('/booking-guest/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const query = {'guest.email': email};
             const result = await bookingCollection.find(query).toArray();
@@ -107,15 +147,7 @@ async function run() {
         });
 
         // Get Host bookings
-        app.get('/booking-host/:email', async (req, res) => {
-            const email = req.params.email;
-            const query = {'host.email': email};
-            const result = await bookingCollection.find(query).toArray();
-            res.send(result);
-        });
-
-        // Get Host bookings
-        app.get('/booking-host/:email', async (req, res) => {
+        app.get('/booking-host/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const query = {'host.email': email};
             const result = await bookingCollection.find(query).toArray();
@@ -130,7 +162,7 @@ async function run() {
         });
 
         // Cancel a booking - delete a booking
-        app.delete('/cancel-booking/:id', async (req, res) => {
+        app.delete('/cancel-booking/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const query = {_id: new ObjectId(id)};
             const result = await bookingCollection.deleteOne(query);
@@ -151,14 +183,19 @@ async function run() {
             res.send(result);
         });
 
+        // Admin statistics
+        // app.get('/admin-stat', async (req, res) => {
+
+        // });
+
         // User related api's
 
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
             const result = await userCollection.find().toArray();
             res.send(result);
         });
 
-        app.get('/user/:email', async (req, res) => {
+        app.get('/user/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const result = await userCollection.findOne({email});
             res.send(result);
@@ -198,7 +235,7 @@ async function run() {
             res.send(result);
         });
 
-        app.patch('/user/:email', async (req, res) => {
+        app.patch('/user/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const status = req.body;
             const query = {email: email};
@@ -212,19 +249,27 @@ async function run() {
             res.send(result);
         });
 
-        app.patch('/update-role/:email', async (req, res) => {
-            const email = req.params.email;
-            const updateRole = req.body;
-            const query = {email: email};
-            const updatedDoc = {
-                $set: {
-                    role: updateRole.role,
-                    status: updateRole.status,
-                },
-            };
-            const result = await userCollection.updateMany(query, updatedDoc);
-            res.send(result);
-        });
+        app.patch(
+            '/update-role/:email',
+            verifyToken,
+            verifyAdmin,
+            async (req, res) => {
+                const email = req.params.email;
+                const updateRole = req.body;
+                const query = {email: email};
+                const updatedDoc = {
+                    $set: {
+                        role: updateRole.role,
+                        status: updateRole.status,
+                    },
+                };
+                const result = await userCollection.updateMany(
+                    query,
+                    updatedDoc
+                );
+                res.send(result);
+            }
+        );
 
         // Rooms related api's
         app.get('/rooms', async (req, res) => {
@@ -255,13 +300,13 @@ async function run() {
             res.send(result);
         });
 
-        app.post('/rooms', async (req, res) => {
+        app.post('/rooms', verifyToken, verifyHost, async (req, res) => {
             const roomData = req.body;
             const result = await roomCollection.insertOne(roomData);
             res.send(result);
         });
 
-        app.delete('/room/:id', async (req, res) => {
+        app.delete('/room/:id', verifyToken, async (req, res) => {
             const id = req.params.id;
             const query = {_id: new ObjectId(id)};
             const result = await roomCollection.deleteOne(query);

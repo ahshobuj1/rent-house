@@ -73,14 +73,14 @@ const AuthProvider = ({children}) => {
     };
 
     // Get token from server
-    /*   const getToken = async (email) => {
+    const getToken = async (email) => {
         const {data} = await axios.post(
             `${import.meta.env.VITE_API_URL}/jwt`,
             {email},
             {withCredentials: true}
         );
         return data;
-    }; */
+    };
 
     // onAuthStateChange
     useEffect(() => {
@@ -88,7 +88,7 @@ const AuthProvider = ({children}) => {
             setUser(currentUser);
             console.log('currentUser: ', currentUser);
             if (currentUser) {
-                // getToken(currentUser.email);
+                getToken(currentUser.email);
                 saveUser(currentUser);
             }
             setLoading(false);
