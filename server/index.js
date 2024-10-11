@@ -98,10 +98,34 @@ async function run() {
             res.send({clientSecret: client_secret});
         });
 
+        // Get Guest bookings
+        app.get('/booking-guest/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {'guest.email': email};
+            const result = await bookingCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        // Get Host bookings
+        app.get('/booking-host/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {'host.email': email};
+            const result = await bookingCollection.find(query).toArray();
+            res.send(result);
+        });
+
         // Booking related api, Payment History
         app.post('/booking', async (req, res) => {
             const paymentInfo = req.body;
-            const result = bookingCollection.insertOne(paymentInfo);
+            const result = await bookingCollection.insertOne(paymentInfo);
+            res.send(result);
+        });
+
+        // Cancel a booking - delete a booking
+        app.delete('/cancel-booking/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await bookingCollection.deleteOne(query);
             res.send(result);
         });
 
@@ -112,7 +136,7 @@ async function run() {
             const query = {_id: new ObjectId(id)};
             const updatedDoc = {
                 $set: {
-                    status: status,
+                    booked: status,
                 },
             };
             const result = await roomCollection.updateOne(query, updatedDoc);
