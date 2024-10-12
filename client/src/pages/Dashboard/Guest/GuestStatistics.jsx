@@ -6,6 +6,7 @@ import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import {useQuery} from '@tanstack/react-query';
 import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
 import SalesLineChart from '../../../components/Dashboard/Sidenav/SalesLineChart';
+import {formatDistanceToNow} from 'date-fns';
 
 const GuestStatistics = () => {
   const axiosSecure = useAxiosSecure();
@@ -68,7 +69,8 @@ const GuestStatistics = () => {
                 Guest Since...
               </p>
               <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-                {guestStat?.guestSince?.Timestamp}
+                {guestStat?.guestSince?.Timestamp &&
+                  formatDistanceToNow(new Date(guestStat.guestSince.Timestamp))}
               </h4>
             </div>
           </div>

@@ -14,58 +14,81 @@ import ManageUsers from '../pages/Dashboard/Admin/ManageUsers';
 import Profile from '../pages/Dashboard/Common/Profile';
 import ManageBookings from '../pages/Dashboard/Host/ManageBookings';
 import MyBookings from '../pages/Dashboard/Guest/MyBookings';
+import AdminRoute from './AdminRoute';
+import HostRoute from './HostRoute';
+import PrivateRoute from './PrivateRoute';
 
 export const router = createBrowserRouter([
-    {
+  {
+    path: '/',
+    element: <Main />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
         path: '/',
-        element: <Main />,
-        errorElement: <ErrorPage />,
-        children: [
-            {
-                path: '/',
-                element: <Home />,
-            },
-            {
-                path: '/room/:id',
-                element: <RoomDetails />,
-            },
-        ],
-    },
-    {path: '/login', element: <Login />},
-    {path: '/signup', element: <SignUp />},
+        element: <Home />,
+      },
+      {
+        path: '/room/:id',
+        element: <RoomDetails />,
+      },
+    ],
+  },
+  {path: '/login', element: <Login />},
+  {path: '/signup', element: <SignUp />},
 
-    {
-        path: '/dashboard',
-        element: <Dashboard />,
-        children: [
-            {
-                index: true,
-                element: <Statistics />,
-            },
-            {
-                path: 'add-room',
-                element: <AddRoom />,
-            },
-            {
-                path: 'my-listings',
-                element: <MyListings />,
-            },
-            {
-                path: 'manage-users',
-                element: <ManageUsers />,
-            },
-            {
-                path: 'profile',
-                element: <Profile />,
-            },
-            {
-                path: 'manage-bookings',
-                element: <ManageBookings />,
-            },
-            {
-                path: 'my-bookings',
-                element: <MyBookings />,
-            },
-        ],
-    },
+  {
+    path: '/dashboard',
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Statistics />,
+      },
+      {
+        path: 'add-room',
+        element: (
+          <HostRoute>
+            <AddRoom />
+          </HostRoute>
+        ),
+      },
+      {
+        path: 'my-listings',
+        element: (
+          <HostRoute>
+            <MyListings />
+          </HostRoute>
+        ),
+      },
+      {
+        path: 'manage-users',
+        element: (
+          <AdminRoute>
+            <ManageUsers />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
+      },
+      {
+        path: 'manage-bookings',
+        element: (
+          <HostRoute>
+            <ManageBookings />
+          </HostRoute>
+        ),
+      },
+      {
+        path: 'my-bookings',
+        element: <MyBookings />,
+      },
+    ],
+  },
 ]);
