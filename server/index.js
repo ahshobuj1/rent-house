@@ -249,6 +249,39 @@ async function run() {
       });
     });
 
+    // Guest Statistics
+    app.get('/guest-stat', verifyToken, async (req, res) => {
+      const user = req.user;
+      const query = {'guest.email': user.email};
+      const bookings = await bookingCollection
+        .find(query, {projection: {price: 1, date: 1}})
+        .toArray();
+
+      const totalSpent = bookings.reduce(
+        (prev, booking) => prev + booking.price,
+        0
+      );
+
+      const timestamp = await userCollection.findOne(
+        {email: user?.email},
+        {projection: {Timestamp: 1}}
+      );
+
+      const chartData = bookings.map((booking) => {
+        const date = new Date(booking?.date);
+        const formatDate = date.toLocaleDateString('en-GB');
+        return [formatDate, booking.price];
+      });
+      chartData.unshift(['day', 'sales']);
+
+      res.send({
+        totalBookings: bookings.length,
+        totalSpent,
+        guestSince: timestamp,
+        chartData,
+      });
+    });
+
     // User related api's
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
