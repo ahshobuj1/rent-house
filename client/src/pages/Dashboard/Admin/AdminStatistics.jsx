@@ -4,17 +4,20 @@ import {BsFillCartPlusFill, BsFillHouseDoorFill} from 'react-icons/bs';
 import {useQuery} from '@tanstack/react-query';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import SalesLineChart from '../../../components/Dashboard/Sidenav/SalesLineChart';
+import LoadingSpinner from '../../../components/Shared/LoadingSpinner';
 
 const AdminStatistics = () => {
   const axiosSecure = useAxiosSecure();
 
-  const {data: adminStat = {}} = useQuery({
+  const {data: adminStat = {}, isLoading} = useQuery({
     queryKey: ['admin-stat'],
     queryFn: async () => {
       const res = await axiosSecure('/admin-stat');
       return res.data;
     },
   });
+
+  if (isLoading) return <LoadingSpinner />;
 
   // Fetch Admin Stat Data here
   return (

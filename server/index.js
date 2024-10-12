@@ -212,7 +212,41 @@ async function run() {
       // );
       // const price = totalSales.map((booking) => booking.price);
       // const chartData = [`${day}/${month}`, ` ${price}`];
-      // chartData.unshift(['day', 'sales']);
+      // chartData.unshift(['day', '  sales']);
+    });
+
+    // Host Statistics
+    app.get('/host-stat', verifyToken, verifyHost, async (req, res) => {
+      const user = req.user;
+      const query = {'host.email': user?.email};
+      const totalBookings = await bookingCollection.countDocuments(query);
+      const totalRooms = await roomCollection.countDocuments(query);
+      const timestamp = await userCollection.findOne(
+        {email: user?.email},
+        {projection: {Timestamp: 1}}
+      );
+
+      const options = {projection: {price: 1, date: 1}};
+      const totalSales = await bookingCollection.find(query, options).toArray();
+      const totalPrice = totalSales.reduce(
+        (prev, booking) => prev + booking.price,
+        0
+      );
+
+      const chartData = totalSales.map((booking) => {
+        const date = new Date(booking.date);
+        const formatDate = date.toLocaleDateString('en-GB');
+        return [formatDate, booking.price];
+      });
+      chartData.unshift(['day', 'sales']);
+
+      res.send({
+        totalBookings,
+        totalRooms,
+        totalPrice,
+        hostSince: timestamp,
+        chartData,
+      });
     });
 
     // User related api's
