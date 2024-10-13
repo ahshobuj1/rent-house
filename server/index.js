@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const {MongoClient, ServerApiVersion, ObjectId, Timestamp} = require('mongodb');
 const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const nodemailer = require('nodemailer');
 
 const port = process.env.PORT || 5000;
 
@@ -32,8 +33,33 @@ const client = new MongoClient(uri, {
 
 // Middlewares
 // Send Email
+const sendEmail = (sendAddress, emailData) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for port 465, false for other ports
+    auth: {
+      user: process.env.EMAIL_SEND_USER,
+      pass: process.env.EMAIL_SEND_APP_PASS,
+    },
+  });
 
-// Middlewares
+  const mailOptions = {
+    from: `"DreamStay" <${process.env.EMAIL_SEND_USER}>`,
+    to: sendAddress,
+    subject: emailData.subject,
+    text: emailData.message,
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('[sendEmail]', info.response);
+    }
+  });
+};
+
 // Verify Token Middleware
 const verifyToken = async (req, res, next) => {
   const token = req?.cookies?.token;
@@ -153,6 +179,19 @@ async function run() {
     app.post('/booking', async (req, res) => {
       const paymentInfo = req.body;
       const result = await bookingCollection.insertOne(paymentInfo);
+
+      // Send Email to Guest
+      sendEmail(paymentInfo.guest.email, {
+        subject: 'booked successfully',
+        message: `Hello ${paymentInfo.guest.name}, Your have booked successfully, Here is your TransactionId: ${paymentInfo.transactionId} `,
+      });
+
+      // Send Email to Host
+      sendEmail(paymentInfo.host.email, {
+        subject: `Your room have booked via ${paymentInfo.guest.email}`,
+        message: `Hello ${paymentInfo.host.name}, You room (Title: ${paymentInfo.title}) have booked successfully,`,
+      });
+
       res.send(result);
     });
 
@@ -160,6 +199,21 @@ async function run() {
     app.delete('/cancel-booking/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
+      const userData = await bookingCollection.findOne(query, {
+        projection: {host: 1, guest: 1, title: 1},
+      });
+
+      // Send Email to guest
+      sendEmail(userData.guest.email, {
+        subject: 'Booking cancelled',
+        message: `You have cancelled your booked room successfully, The booking room was: ${userData.title}`,
+      });
+      // Send Email to host
+      sendEmail(userData.host.email, {
+        subject: 'Booking cancelled',
+        message: `Cancelled your booking form <${userData.guest.email}>, The booking was: ${userData.title} `,
+      });
+
       const result = await bookingCollection.deleteOne(query);
       res.send(result);
     });
@@ -308,6 +362,11 @@ async function run() {
           // Update Status
           const updatedStatus = {$set: {status: user?.status}};
           const result = await userCollection.updateOne(query, updatedStatus);
+          //Send Email to updated host
+          sendEmail(user.email, {
+            subject: `Welcome to Host DreamStay`,
+            message: `Hello dear user <${user.email}>, You have updated to Host!`,
+          });
           return res.send(result);
         } else {
           return res.send(isExistUser);
@@ -323,6 +382,12 @@ async function run() {
       };
       const result = await userCollection.updateOne(query, updatedDoc, options);
       res.send(result);
+
+      //Send Email to new user
+      sendEmail(user.email, {
+        subject: `Welcome to DreamStay`,
+        message: `Hello dear user <${user.email}>, Hope you will find your dream destination!`,
+      });
     });
 
     app.patch('/user/:email', verifyToken, async (req, res) => {
