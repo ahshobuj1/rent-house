@@ -12,7 +12,12 @@ const port = process.env.PORT || 5000;
 
 // middleware
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://stay-visa-f4c0d.web.app',
+    'https://stay-visa-f4c0d.firebaseapp.com',
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -233,7 +238,7 @@ async function run() {
     });
 
     // Admin statistics
-    app.get('/admin-stat', async (req, res) => {
+    app.get('/admin-stat', verifyToken, verifyAdmin, async (req, res) => {
       const totalUsers = await userCollection.estimatedDocumentCount();
       const totalRooms = await roomCollection.estimatedDocumentCount();
       const totalBookings = await bookingCollection.estimatedDocumentCount();
