@@ -30,52 +30,55 @@ const client = new MongoClient(uri, {
   },
 });
 
+// Middlewares
+// Send Email
+
+// Middlewares
+// Verify Token Middleware
+const verifyToken = async (req, res, next) => {
+  const token = req?.cookies?.token;
+  if (!token) {
+    return res.status(401).send({message: 'unauthorized access'});
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      console.log(err);
+      return res.status(401).send({message: 'unauthorized access'});
+    }
+    req.user = decoded;
+    next();
+  });
+};
+
+// Verify Admin
+const verifyAdmin = async (req, res, next) => {
+  const userInfo = req?.user;
+  const query = {email: userInfo.email};
+  const user = await userCollection.findOne(query);
+
+  if (!user) return res.status(401).send({message: 'unauthorized access'});
+  if (user.role === 'Admin') {
+    return next();
+  }
+  res.status(403).json({message: 'forbidden access'});
+};
+
+// Verify host
+const verifyHost = async (req, res, next) => {
+  const userInfo = req.user;
+  const query = {email: userInfo.email};
+  const user = await userCollection.findOne(query);
+  if (!user) return res.status(401).send({message: 'unauthorized access'});
+  if (user.role === 'Host') return next();
+  res.status(403).json({message: 'forbidden access'});
+};
+
 async function run() {
   try {
     const roomCollection = client.db('stayVista').collection('rooms');
     const userCollection = client.db('stayVista').collection('users');
     const bookingCollection = client.db('stayVista').collection('bookings');
-
-    // Middlewares
-    // Verify Token Middleware
-    const verifyToken = async (req, res, next) => {
-      const token = req?.cookies?.token;
-      if (!token) {
-        return res.status(401).send({message: 'unauthorized access'});
-      }
-
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-          console.log(err);
-          return res.status(401).send({message: 'unauthorized access'});
-        }
-        req.user = decoded;
-        next();
-      });
-    };
-
-    // Verify Admin
-    const verifyAdmin = async (req, res, next) => {
-      const userInfo = req?.user;
-      const query = {email: userInfo.email};
-      const user = await userCollection.findOne(query);
-
-      if (!user) return res.status(401).send({message: 'unauthorized access'});
-      if (user.role === 'Admin') {
-        return next();
-      }
-      res.status(403).json({message: 'forbidden access'});
-    };
-
-    // Verify host
-    const verifyHost = async (req, res, next) => {
-      const userInfo = req.user;
-      const query = {email: userInfo.email};
-      const user = await userCollection.findOne(query);
-      if (!user) return res.status(401).send({message: 'unauthorized access'});
-      if (user.role === 'Host') return next();
-      res.status(403).json({message: 'forbidden access'});
-    };
 
     // auth related api
     app.post('/jwt', async (req, res) => {
