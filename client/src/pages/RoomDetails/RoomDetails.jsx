@@ -37,7 +37,7 @@ const RoomDetails = () => {
               <Heading title={room.title} subtitle={room.location} />
               <div className="w-full md:h-[60vh] overflow-hidden rounded-xl">
                 <img
-                  className="object-cover w-full"
+                  className="object-cover md:h-[60vh] w-full "
                   src={room.image}
                   alt="header image"
                 />

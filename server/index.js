@@ -367,11 +367,6 @@ async function run() {
           // Update Status
           const updatedStatus = {$set: {status: user?.status}};
           const result = await userCollection.updateOne(query, updatedStatus);
-          //Send Email to updated host
-          sendEmail(user.email, {
-            subject: `Welcome to Host DreamStay`,
-            message: `Hello dear user <${user.email}>, You have updated to Host!`,
-          });
           return res.send(result);
         } else {
           return res.send(isExistUser);
@@ -424,6 +419,11 @@ async function run() {
             status: updateRole.status,
           },
         };
+        //Send Email to updated host
+        sendEmail(email, {
+          subject: `Welcome to DreamStay Host`,
+          message: `Hello dear user <${user.email}>, Your requested have accepted, You are Host from now !`,
+        });
         const result = await userCollection.updateMany(query, updatedDoc);
         res.send(result);
       }
