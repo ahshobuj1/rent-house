@@ -436,7 +436,7 @@ async function run() {
       if (category !== 'null') {
         query = {category: category};
       }
-      const result = await roomCollection.find(query).toArray();
+      const result = await roomCollection.find(query).sort({_id: -1}).toArray();
       res.send(result);
     });
 

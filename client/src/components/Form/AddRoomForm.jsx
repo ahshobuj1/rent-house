@@ -58,6 +58,8 @@ const AddRoomForm = ({
               {/* Calender */}
               <DateRange
                 rangeColors={['#f43f5e']}
+                // disabled prev date
+                minDate={new Date()}
                 editableDateInputs={true}
                 onChange={(item) => handleDate(item)}
                 moveRangeOnFirstSelection={false}
