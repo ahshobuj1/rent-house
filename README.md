@@ -1,4 +1,4 @@
-# stayVista-starter-template
+# DreamStay-starter-template
 
 - [Live Site](https://stay-visa-f4c0d.web.app/)
 
@@ -40,7 +40,7 @@
 - Sidebar modifications.
 - Secure client and server routes.
 - Become a host Button functionality.
-- Booking modal and routes in dasboard.
+- Booking modal and routes in dashboard.
 
 **Part 4 :**
 
@@ -71,3 +71,5 @@
 - [@stripe/stripe-js](https://www.npmjs.com/package/@stripe/stripe-js)
 - [firebase](https://www.npmjs.com/package/firebase)
 - [react-google-charts](https://www.react-google-charts.com/examples/line-chart)
+- [sweetalert2](https://sweetalert2.github.io/)
+- [daisyui](https://daisyui.com/)

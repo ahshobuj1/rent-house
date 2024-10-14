@@ -410,7 +410,7 @@ async function run() {
       verifyToken,
       verifyAdmin,
       async (req, res) => {
-        const email = req.params.email;
+        const email = req?.params?.email;
         const updateRole = req.body;
         const query = {email: email};
         const updatedDoc = {
@@ -422,7 +422,7 @@ async function run() {
         //Send Email to updated host
         sendEmail(email, {
           subject: `Welcome to DreamStay Host`,
-          message: `Hello dear user <${user.email}>, Your requested have accepted, You are Host from now !`,
+          message: `Hello dear user <${email}>, Your requested have accepted, You are Host from now !`,
         });
         const result = await userCollection.updateMany(query, updatedDoc);
         res.send(result);
