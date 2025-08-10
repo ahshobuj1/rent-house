@@ -7,6 +7,7 @@ import BookingModal from '../Modal/BookingModal';
 import useAuth from '../../hooks/useAuth';
 import Swal from 'sweetalert2';
 import {useNavigate} from 'react-router-dom';
+import LoadingSpinner from '../Shared/LoadingSpinner';
 
 const RoomReservation = ({room}) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +18,8 @@ const RoomReservation = ({room}) => {
       key: 'selection',
     },
   ]);
-  const {user} = useAuth();
+  const {user, loading} = useAuth();
+
   const navigate = useNavigate();
 
   // Update state when room prop changes
@@ -44,6 +46,10 @@ const RoomReservation = ({room}) => {
 
   // Handle Reserve
   const handleReserve = () => {
+    if (loading) {
+      return <LoadingSpinner />;
+    }
+
     if (!user) {
       return Swal.fire({
         title: 'You have to login first?',
