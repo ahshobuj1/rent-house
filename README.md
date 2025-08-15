@@ -2,11 +2,6 @@
 
 - [Live Site](https://stay-visa-f4c0d.web.app/)
 
-### Important Links:
-
-- [ Resources](https://github.com/shakilahmedatik/b9-stayVista-resources)
-- [Project Requirement Doc](https://docs.google.com/document/d/1rzueKvZTinMb3XY7cuDNH0S0d_l8CflG1H95VUi2Dto/edit?usp=sharing)
-
 ## Topics Covered in each session:
 
 **Part 1 :**
